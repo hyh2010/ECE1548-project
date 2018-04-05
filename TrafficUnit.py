@@ -1,19 +1,8 @@
-def serve(env, resource, service_time):
-    arrival_time = env.now
-    with resource.request() as request:
-        yield request
-        service_start_time = env.now
-        yield env.timeout(service_time)
-        departure_time = env.now
-        response_time = departure_time - arrival_time
-
-    return response_time
+from ServerBase import ServerBase
 
 class TrafficUnit:
-    def __init__(self, env, resource):
-        super().__init__()
-        self.__resource__ = resource
-        self.__action__ = env.process(serve(env, resource, 5))
+    def __init__(self, server):
+        self.__action__ = server.action()
 
     def response_time(self):
         return self.__action__.value
@@ -24,24 +13,33 @@ import numpy as np
 
 class testTrafficUnit(unittest.TestCase):
     class __Simulation__:
+        class __TestServer__(ServerBase):
+            def __init__(self, env, resource):
+                super().__init__(env, resource)
+
+            def service_time(self):
+                return 5
+
         def __init__(self):
             self.__traffic__ = []
+            env = simpy.Environment()
+            resource = simpy.Resource(env, capacity=1)
+            env.process(self.__traffic_source__())
+            self.__server__ = self.__TestServer__(env, resource)
+            self.__env__ = env
 
-        def __traffic_source__(self, env, resource):
-            traffic1 = TrafficUnit(env, resource)
+        def __traffic_source__(self):
+            traffic1 = TrafficUnit(self.__server__)
             self.__traffic__.append(traffic1)
-            yield env.timeout(3)
-            traffic2 = TrafficUnit(env, resource)
+            yield self.__env__.timeout(3)
+            traffic2 = TrafficUnit(self.__server__)
             self.__traffic__.append(traffic2)
-            yield env.timeout(2)
-            traffic3 = TrafficUnit(env, resource)
+            yield self.__env__.timeout(2)
+            traffic3 = TrafficUnit(self.__server__) 
             self.__traffic__.append(traffic3)
 
         def run(self):
-            env = simpy.Environment()
-            resource = simpy.Resource(env, capacity=1)
-            env.process(self.__traffic_source__(env, resource))
-            env.run()
+            self.__env__.run()
 
         def response_times(self):
             return [x.response_time() for x in self.__traffic__]
