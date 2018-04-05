@@ -7,10 +7,9 @@ class ServerBase(ABC):
         self.__resource__ = resource
 
     @abstractmethod
-    def service_time(self):
-        pass
+    def service_time(self): pass
 
-    def action(self):
+    def add_process(self):
         return self.__env__.process(self.serve())
 
     def serve(self):
@@ -23,4 +22,12 @@ class ServerBase(ABC):
             response_time = departure_time - arrival_time
 
         return response_time
+
+class ServerConstantServiceTime(ServerBase):
+    def __init__(self, env, resource, service_time):
+        super().__init__(env, resource)
+        self.__service_time__ = service_time
+
+    def service_time(self):
+        return self.__service_time__
 

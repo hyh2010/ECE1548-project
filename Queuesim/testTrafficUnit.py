@@ -3,16 +3,18 @@ import simpy
 import numpy as np
 
 from TrafficUnit import TrafficUnit
-from MockTestServer import MockTestServer
+from Server import ServerConstantServiceTime
 
 class testTrafficUnit(unittest.TestCase):
     class __Simulation__:
+
         def __init__(self):
             self.__traffic__ = []
             env = simpy.Environment()
             resource = simpy.Resource(env, capacity=1)
             env.process(self.__traffic_source__())
-            self.__server__ = MockTestServer(env, resource)
+            service_time = 5
+            self.__server__ = ServerConstantServiceTime(env, resource, service_time)
             self.__env__ = env
 
         def __traffic_source__(self):
