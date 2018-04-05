@@ -1,15 +1,5 @@
 import random
 
-
-RANDOM_SEED = 42
-NEW_CUSTOMERS = 5 # Total number of customers
-INTERVAL_CUTOMERS = 10.0 # Generate new customers roughly every x seconds
-MIN_PATIENCE = 1
-MAX_PATIENCE = 3
-
-import unittest
-import simpy
-
 class Customer:
     def __init__(self, env, resource):
         self.__env__ = env
@@ -18,35 +8,51 @@ class Customer:
 
     def arrive(self, service_time):
         arrival_time = self.__env__.now
-        print("Customer arrives at %7.4f" % arrival_time)
         with self.__resource__.request() as request:
             yield request
             service_start_time = self.__env__.now
-            waiting_time = service_start_time - arrival_time
-            print("Customer waiting time %7.4f" % waiting_time)
             yield self.__env__.timeout(service_time)
             departure_time = self.__env__.now
-            print("Customer leaves at %7.4f" % departure_time)
             self.__response_time__ = departure_time - arrival_time
 
-class testCustomer(unittest.TestCase):
-    #class __Simulation__:
+    def response_time(self):
+        return self.__response_time__
 
-    def __customer_source__(self, env, resource):
-        customer1 = Customer(env, resource)
-        env.process(customer1.arrive(5))
-        yield env.timeout(3)
-        customer2 = Customer(env, resource)
-        env.process(customer2.arrive(3))
-        yield env.timeout(2)
-        customer3 = Customer(env, resource)
-        env.process(customer3.arrive(2))
+import unittest
+import simpy
+import numpy as np
+
+class testCustomer(unittest.TestCase):
+    class __Simulation__:
+        def __init__(self):
+            self.__customers__ = []
+
+        def __customer_source__(self, env, resource):
+            customer1 = Customer(env, resource)
+            self.__customers__.append(customer1)
+            env.process(customer1.arrive(5))
+            yield env.timeout(3)
+            customer2 = Customer(env, resource)
+            self.__customers__.append(customer2)
+            env.process(customer2.arrive(5))
+            yield env.timeout(2)
+            customer3 = Customer(env, resource)
+            self.__customers__.append(customer3)
+            env.process(customer3.arrive(5))
+
+        def run(self):
+            env = simpy.Environment()
+            resource = simpy.Resource(env, capacity=1)
+            env.process(self.__customer_source__(env, resource))
+            env.run()
+
+        def response_times(self):
+            return [customer.response_time() for customer in self.__customers__]
 
     def test(self):
-        env = simpy.Environment()
-        resource = simpy.Resource(env, capacity=1)
-        env.process(self.__customer_source__(env, resource))
-        env.run()
+        simulation = self.__Simulation__()
+        simulation.run()
+        np.testing.assert_almost_equal(simulation.response_times(), [5, 7, 10])
 
 if __name__ == '__main__':
     unittest.main()
