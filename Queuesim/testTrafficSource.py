@@ -2,8 +2,8 @@ import unittest
 import simpy
 import numpy as np
 
-from TrafficSource import TrafficSourceConstantInterarrival
-from Server import ServerConstantServiceTime
+from TrafficSource import TrafficSourceConstInterarrival
+from Server import ServerConstServiceTime
 
 class testTrafficSource(unittest.TestCase):
 
@@ -11,13 +11,13 @@ class testTrafficSource(unittest.TestCase):
         service_time = 5
         self.__env__ = simpy.Environment()
         resource = simpy.Resource(self.__env__, capacity=1)
-        self.__server__ = ServerConstantServiceTime(self.__env__, resource, service_time)
+        self.__server__ = ServerConstServiceTime(self.__env__, resource, service_time)
 
     def test_single_source(self):
         interarrival_time = 2
         number_of_packets = 5
-        source = TrafficSourceConstantInterarrival(self.__env__, self.__server__, interarrival_time)
-        source.traffic_generator(number_of_packets)
+        source = TrafficSourceConstInterarrival(self.__env__, self.__server__, interarrival_time)
+        source.add_traffic_generator_process(number_of_packets)
         self.__env__.run()
         response_times = [x.response_time() for x in source.traffic()]
 
@@ -30,16 +30,16 @@ class testTrafficSource(unittest.TestCase):
         interarrival_time_source2 = 4
         number_of_packets_source2 = 2
 
-        source1 = TrafficSourceConstantInterarrival(self.__env__,
-                                                    self.__server__,
-                                                    interarrival_time_source1)
+        source1 = TrafficSourceConstInterarrival(self.__env__,
+                                                 self.__server__,
+                                                 interarrival_time_source1)
 
-        source2 = TrafficSourceConstantInterarrival(self.__env__,
-                                                    self.__server__,
-                                                    interarrival_time_source2)
+        source2 = TrafficSourceConstInterarrival(self.__env__,
+                                                 self.__server__,
+                                                 interarrival_time_source2)
 
-        source1.traffic_generator(number_of_packets_source1)
-        source2.traffic_generator(number_of_packets_source2)
+        source1.add_traffic_generator_process(number_of_packets_source1)
+        source2.add_traffic_generator_process(number_of_packets_source2)
 
         self.__env__.run()
 

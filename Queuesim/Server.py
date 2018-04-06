@@ -3,31 +3,31 @@ from abc import ABC, abstractmethod
 class ServerBase(ABC):
 
     def __init__(self, env, resource):
-        self.__env__ = env
-        self.__resource__ = resource
+        self.__env = env
+        self.__resource = resource
 
     @abstractmethod
     def service_time(self): pass
 
     def add_process(self):
-        return self.__env__.process(self.serve())
+        return self.__env.process(self.serve())
 
     def serve(self):
-        arrival_time = self.__env__.now
-        with self.__resource__.request() as request:
+        arrival_time = self.__env.now
+        with self.__resource.request() as request:
             yield request
-            service_start_time = self.__env__.now
-            yield self.__env__.timeout(self.service_time())
-            departure_time = self.__env__.now
+            service_start_time = self.__env.now
+            yield self.__env.timeout(self.service_time())
+            departure_time = self.__env.now
             response_time = departure_time - arrival_time
 
         return response_time
 
-class ServerConstantServiceTime(ServerBase):
+class ServerConstServiceTime(ServerBase):
     def __init__(self, env, resource, service_time):
         super().__init__(env, resource)
-        self.__service_time__ = service_time
+        self.__service_time = service_time
 
     def service_time(self):
-        return self.__service_time__
+        return self.__service_time
 
