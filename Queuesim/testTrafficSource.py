@@ -48,3 +48,6 @@ class testTrafficSource(unittest.TestCase):
 
         np.testing.assert_almost_equal(response_times_source1, [5, 12, 19])
         np.testing.assert_almost_equal(response_times_source2, [9, 15])
+
+if __name__ == '__main__':
+    unittest.main()

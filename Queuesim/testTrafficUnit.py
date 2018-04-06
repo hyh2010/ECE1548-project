@@ -37,3 +37,6 @@ class testTrafficUnit(unittest.TestCase):
         simulation = self.__Simulation__()
         simulation.run()
         np.testing.assert_almost_equal(simulation.response_times(), [5, 7, 10])
+
+if __name__ == '__main__':
+    unittest.main()
