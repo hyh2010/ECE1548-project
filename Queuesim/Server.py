@@ -1,16 +1,21 @@
+import simpy
+
 from abc import ABC, abstractmethod
 
 class ServerBase(ABC):
 
-    def __init__(self, env, resource):
+    def __init__(self, env, capacity=1):
         self.__env = env
-        self.__resource = resource
+        self.__resource = simpy.Resource(env, capacity)
 
     @abstractmethod
     def service_time(self): pass
 
     def add_process(self):
         return self.__env.process(self.serve())
+
+    def env(self):
+        return self.__env
 
     def serve(self):
         arrival_time = self.__env.now
@@ -24,8 +29,8 @@ class ServerBase(ABC):
         return response_time
 
 class ServerConstServiceTime(ServerBase):
-    def __init__(self, env, resource, service_time):
-        super().__init__(env, resource)
+    def __init__(self, env, service_time, capacity=1):
+        super().__init__(env, capacity)
         self.__service_time = service_time
 
     def service_time(self):
