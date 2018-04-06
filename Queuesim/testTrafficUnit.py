@@ -13,7 +13,7 @@ class testTrafficUnit(unittest.TestCase):
             env = simpy.Environment()
             env.process(self.__traffic_source())
             service_time = 5
-            self.__server = ServerConstServiceTime(env, service_time)
+            self.__server = ServerConstServiceTime(env, capacity=1, service_time=service_time)
             self.__env = env
 
         def __traffic_source(self):

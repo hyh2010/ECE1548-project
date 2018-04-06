@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 class ServerBase(ABC):
 
-    def __init__(self, env, capacity=1):
+    def __init__(self, env, capacity):
         self.__env = env
         self.__resource = simpy.Resource(env, capacity)
 
@@ -29,7 +29,7 @@ class ServerBase(ABC):
         return response_time
 
 class ServerConstServiceTime(ServerBase):
-    def __init__(self, env, service_time, capacity=1):
+    def __init__(self, env, capacity, service_time):
         super().__init__(env, capacity)
         self.__service_time = service_time
 

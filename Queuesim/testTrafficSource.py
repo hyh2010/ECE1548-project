@@ -10,7 +10,7 @@ class testTrafficSource(unittest.TestCase):
     def setUp(self):
         service_time = 5
         env = simpy.Environment()
-        self.__server = ServerConstServiceTime(env, service_time)
+        self.__server = ServerConstServiceTime(env, capacity=1, service_time=service_time)
 
     def test_single_source(self):
         interarrival_time = 2
