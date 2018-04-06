@@ -22,7 +22,6 @@ class TrafficSourceBase(ABC):
         for i in range(n):
             yield self.__env__.timeout(self.interarrival_time())
             self.__traffic__.append(TrafficUnit(self.__server__))
-            print("Traffic generated at time %7.4f" % self.__env__.now)
 
 class TrafficSourceConstantInterarrival(TrafficSourceBase):
     def __init__(self, env, server, interarrival_time):
