@@ -3,7 +3,7 @@ import simpy
 import numpy as np
 
 from TrafficUnit import TrafficUnit
-from Server import ServerConstServiceTime
+from Queue import QueueConstServiceTime
 
 class testTrafficUnit(unittest.TestCase):
     class __Simulation:
@@ -13,17 +13,17 @@ class testTrafficUnit(unittest.TestCase):
             env = simpy.Environment()
             env.process(self.__traffic_source())
             service_time = 5
-            self.__server = ServerConstServiceTime(env, capacity=1, service_time=service_time)
+            self.__queue = QueueConstServiceTime(env, capacity=1, service_time=service_time)
             self.__env = env
 
         def __traffic_source(self):
-            traffic1 = TrafficUnit(self.__server)
+            traffic1 = TrafficUnit(self.__queue)
             self.__traffic.append(traffic1)
             yield self.__env.timeout(3)
-            traffic2 = TrafficUnit(self.__server)
+            traffic2 = TrafficUnit(self.__queue)
             self.__traffic.append(traffic2)
             yield self.__env.timeout(2)
-            traffic3 = TrafficUnit(self.__server) 
+            traffic3 = TrafficUnit(self.__queue) 
             self.__traffic.append(traffic3)
 
         def run(self):

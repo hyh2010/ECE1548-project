@@ -3,21 +3,21 @@ import simpy
 import numpy as np
 
 from TrafficSource import TrafficSourceConstInterarrival
-from Server import ServerConstServiceTime
+from Queue import QueueConstServiceTime
 
 class testTrafficSource(unittest.TestCase):
 
     def setUp(self):
         service_time = 5
         env = simpy.Environment()
-        self.__server = ServerConstServiceTime(env, capacity=1, service_time=service_time)
+        self.__queue = QueueConstServiceTime(env, capacity=1, service_time=service_time)
 
     def test_single_source(self):
         interarrival_time = 2
         number_of_packets = 5
-        source = TrafficSourceConstInterarrival(self.__server, interarrival_time)
+        source = TrafficSourceConstInterarrival(self.__queue, interarrival_time)
         source.add_traffic_generator_process(number_of_packets)
-        self.__server.env().run()
+        self.__queue.env().run()
         response_times = [x.response_time() for x in source.traffic()]
 
         expected_response_times = [5, 8, 11, 14, 17]
@@ -30,16 +30,16 @@ class testTrafficSource(unittest.TestCase):
         interarrival_time_source2 = 4
         number_of_packets_source2 = 2
 
-        source1 = TrafficSourceConstInterarrival(self.__server,
+        source1 = TrafficSourceConstInterarrival(self.__queue,
                                                  interarrival_time_source1)
 
-        source2 = TrafficSourceConstInterarrival(self.__server,
+        source2 = TrafficSourceConstInterarrival(self.__queue,
                                                  interarrival_time_source2)
 
         source1.add_traffic_generator_process(number_of_packets_source1)
         source2.add_traffic_generator_process(number_of_packets_source2)
 
-        self.__server.env().run()
+        self.__queue.env().run()
 
         response_times_source1 = [x.response_time() for x in source1.traffic()]
         response_times_source2 = [x.response_time() for x in source2.traffic()]

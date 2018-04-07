@@ -2,7 +2,7 @@ import simpy
 
 from abc import ABC, abstractmethod
 
-class ServerBase(ABC):
+class QueueBase(ABC):
 
     def __init__(self, env, capacity):
         self.__env = env
@@ -12,12 +12,12 @@ class ServerBase(ABC):
     def service_time(self): pass
 
     def add_process(self):
-        return self.__env.process(self.serve())
+        return self.__env.process(self.__serve())
 
     def env(self):
         return self.__env
 
-    def serve(self):
+    def __serve(self):
         arrival_time = self.__env.now
         with self.__resource.request() as request:
             yield request
@@ -28,7 +28,7 @@ class ServerBase(ABC):
 
         return response_time
 
-class ServerConstServiceTime(ServerBase):
+class QueueConstServiceTime(QueueBase):
     def __init__(self, env, capacity, service_time):
         super().__init__(env, capacity)
         self.__service_time = service_time
