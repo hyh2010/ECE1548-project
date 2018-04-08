@@ -3,4 +3,8 @@ class TrafficUnit:
         self.__action = queue.add_process()
 
     def response_time(self):
-        return self.__action.value
+        try:
+            return self.__action.value
+        except AttributeError:
+            # Traffic still in the queue
+            pass

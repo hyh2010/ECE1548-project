@@ -23,6 +23,16 @@ class testTrafficSource(unittest.TestCase):
         expected_response_times = [5, 8, 11, 14, 17]
         np.testing.assert_almost_equal(response_times, expected_response_times)
 
+    def test_single_source_unlimited(self):
+        interarrival_time = 2
+        source = TrafficSourceConstInterarrival(self.__queue, interarrival_time)
+        source.add_traffic_generator_process_unlimited()
+        self.__queue.env().run(30)
+        response_times = [x.response_time() for x in source.traffic() if x.response_time() != None]
+
+        expected_response_times = [5, 8, 11, 14, 17] 
+        np.testing.assert_almost_equal(response_times, expected_response_times)
+
     def test_multiple_sources(self):
         interarrival_time_source1 = 3
         number_of_packets_source1 = 3
