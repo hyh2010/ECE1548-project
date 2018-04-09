@@ -19,17 +19,19 @@ class TrafficSourceBase(ABC):
     def traffic(self):
         return self.__traffic
 
+    def __generate_single_traffic(self):
+        yield self.__queue.env().timeout(self.interarrival_time())
+        self.__traffic.append(TrafficUnit(self.__queue))
+
     def __generate(self, n):
         # generates n units of traffic
         for i in range(n):
-            yield self.__queue.env().timeout(self.interarrival_time())
-            self.__traffic.append(TrafficUnit(self.__queue))
+            yield from self.__generate_single_traffic()
 
     def __generate_unlimited(self):
         # generates traffic forever
         while True:
-            yield self.__queue.env().timeout(self.interarrival_time())
-            self.__traffic.append(TrafficUnit(self.__queue))
+            yield from self.__generate_single_traffic()
 
 class TrafficSourceConstInterarrival(TrafficSourceBase):
     def __init__(self, queue, interarrival_time):

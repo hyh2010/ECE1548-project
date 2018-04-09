@@ -26,15 +26,27 @@ class testTrafficUnit(unittest.TestCase):
             traffic3 = TrafficUnit(self.__queue) 
             self.__traffic.append(traffic3)
 
-        def run(self):
-            self.__env.run()
+        def run(self, until=None):
+            self.__env.run(until)
+
+        def number_in_queue(self):
+            return self.__queue.number_in_queue()
 
         def response_times(self):
             return [x.response_time() for x in self.__traffic]
 
     def test(self):
         simulation = self.__Simulation()
+        simulation.run(until=1)
+        self.assertEqual(simulation.number_in_queue(), 1)
+        simulation.run(until=4)
+        self.assertEqual(simulation.number_in_queue(), 2)
+        simulation.run(until=6)
+        self.assertEqual(simulation.number_in_queue(), 2)
+        simulation.run(until=11)
+        self.assertEqual(simulation.number_in_queue(), 1)
         simulation.run()
+        self.assertEqual(simulation.number_in_queue(), 0)
         expected_response_times = [5, 7, 10]
         np.testing.assert_almost_equal(simulation.response_times(), expected_response_times)
 
