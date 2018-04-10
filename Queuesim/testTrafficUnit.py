@@ -3,7 +3,8 @@ import simpy
 import numpy as np
 
 from TrafficUnit import TrafficUnit
-from Queue import QueueConstServiceTime
+from Queue import Queue
+from Rand import RandDeterministic
 
 class testTrafficUnit(unittest.TestCase):
     class __Simulation:
@@ -13,7 +14,7 @@ class testTrafficUnit(unittest.TestCase):
             env = simpy.Environment()
             env.process(self.__traffic_source())
             service_time = 5
-            self.__queue = QueueConstServiceTime(env, capacity=1, service_time=service_time)
+            self.__queue = Queue(env, capacity=1, rand_service_time=RandDeterministic(service_time))
             self.__env = env
 
         def __traffic_source(self):

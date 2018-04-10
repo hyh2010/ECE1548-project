@@ -3,14 +3,15 @@ import simpy
 import numpy as np
 
 from TrafficSource import TrafficSourceConstInterarrival
-from Queue import QueueConstServiceTime
+from Queue import Queue
+from Rand import RandDeterministic
 
 class testTrafficSource(unittest.TestCase):
 
     def setUp(self):
         service_time = 5
         env = simpy.Environment()
-        self.__queue = QueueConstServiceTime(env, capacity=1, service_time=service_time)
+        self.__queue = Queue(env, capacity=1, rand_service_time=RandDeterministic(service_time))
 
     def test_single_source(self):
         interarrival_time = 2

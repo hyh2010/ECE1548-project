@@ -3,7 +3,8 @@ import math
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from QueueExponentialServiceTime import QueueExponentialServiceTime
+from Queuesim import Queue
+from RandExponential import RandExponential
 from TrafficSourcePoissonArrival import TrafficSourcePoissonArrival
 from QueueMonitor import QueueMonitorQueueLength
 
@@ -13,11 +14,11 @@ def exponentialpdf(x,lambd):
 
 lambd = 0.5
 mu = 2
-simulation_time = 2000
-monitor_sample_period = 0.5/lambd
+simulation_time = 200
+monitor_sample_period = 0.1/lambd
 
 env = simpy.Environment()
-controller = QueueExponentialServiceTime(env, capacity=1, mu=mu)
+controller = Queue(env, capacity=1, rand_service_time=RandExponential(mu))
 switch = TrafficSourcePoissonArrival(controller, lambd)
 switch.add_traffic_generator_process_unlimited()
 
