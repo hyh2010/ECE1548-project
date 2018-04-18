@@ -1,10 +1,10 @@
 class TrafficUnit:
     def __init__(self, queue):
-        self.__action = queue.add_process()
+        self.action = queue.add_process()
 
     def response_time(self):
         try:
-            return self.__action.value
+            return self.action.value
         except AttributeError:
             # Traffic still in the queue
             pass

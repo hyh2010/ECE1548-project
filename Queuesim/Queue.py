@@ -7,6 +7,7 @@ class Queue():
         self.__resource = simpy.Resource(env, capacity)
         self.__rand_service_time = rand_service_time
         self.__number_in_queue = 0
+        self.service_times = []
 
     def add_process(self):
         return self.__env.process(self.serve())
@@ -23,7 +24,9 @@ class Queue():
         with self.__resource.request() as request:
             yield request
             service_start_time = self.__env.now
-            yield self.__env.timeout(self.__rand_service_time.generate())
+            service_time = self.__rand_service_time.generate()
+            self.service_times.append(service_time)
+            yield self.__env.timeout(service_time)
             departure_time = self.__env.now
             response_time = departure_time - arrival_time
         self.__number_in_queue -= 1
