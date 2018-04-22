@@ -17,17 +17,29 @@ n2 = 60
 
 n = 80
 
-save_as = "algorithm1.png"
+save_as1 = "algorithm1.png"
 save_as2 = "algorithm2.png"
 save_as3 = "algorithm3.png"
 
-title = r"$\mathrm{M/M/1\ Queue\ Load\ Estimation:}\ \lambda_1=%.1f,\ \lambda_2=%.1f, \mu=%.1f, \rho_t=%.2f$" %(lambd1, lambd2, mu, rho_t) + "\n" + r"sample_size_sw1=%d, sample_size_sw2=%d" %(n1, n2)
+def open_subplots(title):
+    subplt1=plt.subplot(3,1,1)
+    plt.title(title)
+    plt.ylabel(r'$\hat{\rho}$')
+    subplt2=plt.subplot(3,1,2,sharex=subplt1, sharey=subplt1)
+    plt.ylabel(r'$\hat{\rho_1}$')
+    subplt3=plt.subplot(3,1,3,sharex=subplt1, sharey=subplt1)
+    plt.xlabel(r'time')
+    plt.ylabel(r're-assign')
+    plt.ylim(-0.1, 1.1)
+    return subplt1, subplt2, subplt3
+
+def plot_single_graph(subplt, x, y, marker, label):
+    subplt.plot(x, y, marker, label=label)
+    subplt.legend()
+
+title1 = r"$\mathrm{M/M/1\ Queue\ Load\ Estimation:}\ \lambda_1=%.1f,\ \lambda_2=%.1f, \mu=%.1f, \rho_t=%.2f$" %(lambd1, lambd2, mu, rho_t) + "\n" + r"sample_size_sw1=%d, sample_size_sw2=%d" %(n1, n2)
 
 title2 = r"$\mathrm{M/M/1\ Queue\ Load\ Estimation:}\ \lambda_1=%.1f,\ \lambda_2=%.1f, \mu=%.1f, \rho_t=%.2f$" %(lambd1, lambd2, mu, rho_t) + "\n" + r"sample_size_sw1=%d, sample_size_sw2=%d, sample_size_controller=%d" %(n1, n2, n)
-
-monitor_sample_period = 0.1/lambd2
-
-
 
 simulation_time = 2000
 
@@ -38,96 +50,46 @@ sw2 = TrafficSourceLoadBalance(controller, lambd2, mu, n2, rho_t)
 sw1.add_traffic_generator_process_unlimited()
 sw2.add_traffic_generator_process_unlimited()
 
-monitor = QueueMonitorQueueLength(controller, monitor_sample_period)
-monitor.add_process()
-
 env.run(simulation_time)
 
 traffic_creation_times_sw1 = [x.creation_time() for x in sw1.traffic()]
 
 traffic_creation_times_sw2 = [x.creation_time() for x in sw2.traffic()]
 
-response_times_sw1 = [x.response_time() for x in sw1.traffic() if x.response_time() != None]
-
-response_times_sw2 = [x.response_time() for x in sw2.traffic() if x.response_time() != None]
-
-#plt.plot(traffic_creation_times_sw1[:len(response_times_sw1)],response_times_sw1)
-#plt.plot(traffic_creation_times_sw2[:len(response_times_sw2)],response_times_sw2)
-#plt.plot(monitor.sample_times(), monitor.queue_length_sequence())
-ax1=plt.subplot(3,1,1)
-plt.plot(traffic_creation_times_sw1[n1-1:],sw1.rho_estimates(), '-', label='sw1')
-plt.plot(traffic_creation_times_sw2[n2-1:],sw2.rho_estimates(), '--', label='sw2')
-plt.ylim(-0.1,1.1)
-plt.ylabel(r'$\hat{\rho}$')
-plt.ylim(-0.1,1.1)
-plt.title(title)
-plt.legend()
-plt.subplot(3,1,2,sharex=ax1, sharey=ax1)
 rho1_estimates_times_sw1, rho1_estimates_sw1 = sw1.rho1_estimates()
 rho1_estimates_times_sw2, rho1_estimates_sw2 = sw2.rho1_estimates()
-plt.plot(rho1_estimates_times_sw1, rho1_estimates_sw1, '-', label='sw1')
-plt.plot(rho1_estimates_times_sw2, rho1_estimates_sw2, '--', label='sw2')
-plt.ylabel(r'$\hat{\rho_1}$')
-plt.ylim(-0.1,1.1)
-plt.legend()
-plt.subplot(3,1,3,sharex=ax1)
-plt.plot(traffic_creation_times_sw1, sw1.load_balance(), '-', label='sw1')
-plt.plot(traffic_creation_times_sw2, sw2.load_balance(), '--', label='sw2')
-plt.xlabel(r'time')
-plt.ylabel(r're-assign')
-plt.ylim(-0.1,1.1)
-plt.legend()
-plt.savefig(save_as)
+
+subplt1, subplt2, subplt3 = open_subplots(title1)
+plot_single_graph(subplt1, traffic_creation_times_sw1[n1-1:], sw1.rho_estimates(), '-', 'sw1')
+plot_single_graph(subplt2, rho1_estimates_times_sw1, rho1_estimates_sw1, '-', 'sw1')
+plot_single_graph(subplt3, traffic_creation_times_sw1, sw1.load_balance(), '-', 'sw1')
+
+plot_single_graph(subplt1, traffic_creation_times_sw2[n2-1:], sw2.rho_estimates(), '--', 'sw2')
+plot_single_graph(subplt2, rho1_estimates_times_sw2, rho1_estimates_sw2, '--', 'sw2')
+plot_single_graph(subplt3, traffic_creation_times_sw2, sw2.load_balance(), '--', 'sw2')
+
+plt.savefig(save_as1)
 
 plt.clf()
 
-ax1=plt.subplot(3,1,1,sharex=ax1)
-plt.ylim(-0.1,1.1)
-plt.plot(controller.traffic_arrival_times(), controller.rho_estimates(), '-')
-plt.ylabel(r'$\hat{\rho}$')
-plt.title(title2)
-ax1=plt.subplot(3,1,2, sharex=ax1, sharey=ax1)
-plt.plot(sw1.rho1_estimates_times_controller, sw1.rho1_estimates_controller, '-', label='sw1')
-plt.plot(sw2.rho1_estimates_times_controller, sw2.rho1_estimates_controller, '--', label='sw2')
-plt.ylabel(r'$\hat{\rho_1}$')
-plt.ylim(-0.1,1.1)
-plt.legend()
-plt.subplot(3,1,3,sharex=ax1)
-plt.plot(traffic_creation_times_sw1, sw1.load_balance_controller, '-', label='sw1')
-plt.plot(traffic_creation_times_sw2, sw2.load_balance_controller, '--', label='sw2')
-plt.xlabel(r'time')
-plt.ylabel(r're-assign')
-plt.ylim(-0.1,1.1)
-plt.legend()
+subplt1, subplt2, subplt3 = open_subplots(title1)
+plot_single_graph(subplt1, controller.traffic_arrival_times(), controller.rho_estimates(), '-', 'controller')
+plot_single_graph(subplt2, sw1.rho1_estimates_times_controller, sw1.rho1_estimates_controller, '-', 'sw1')
+plot_single_graph(subplt3, traffic_creation_times_sw1, sw1.load_balance_controller, '-', 'sw1')
+
+plot_single_graph(subplt2, sw2.rho1_estimates_times_controller, sw2.rho1_estimates_controller, '--', 'sw2')
+plot_single_graph(subplt3, traffic_creation_times_sw2, sw2.load_balance_controller, '--', 'sw2')
+
 plt.savefig(save_as2)
 
 plt.clf()
-ax1=plt.subplot(3,1,1,sharex=ax1)
-plt.ylim(-0.1,1.1)
-plt.plot(controller.traffic_arrival_times_no_mu(), controller.rho_estimates_no_mu(), '-')
-plt.ylabel(r'$\hat{\rho}$')
-plt.title(title2)
-ax1=plt.subplot(3,1,2, sharex=ax1, sharey=ax1)
-plt.plot(sw1.rho1_estimates_no_mu_times_controller, sw1.rho1_estimates_no_mu_controller, '-', label='sw1')
-plt.plot(sw2.rho1_estimates_no_mu_times_controller, sw2.rho1_estimates_no_mu_controller, '--', label='sw2')
-plt.ylabel(r'$\hat{\rho_1}$')
-plt.ylim(-0.1,1.1)
-plt.legend()
-plt.subplot(3,1,3,sharex=ax1)
-plt.plot(traffic_creation_times_sw1, sw1.load_balance_no_mu_controller, '-', label='sw1')
-plt.plot(traffic_creation_times_sw2, sw2.load_balance_no_mu_controller, '--', label='sw2')
-plt.xlabel(r'time')
-plt.ylabel(r're-assign')
-plt.ylim(-0.1,1.1)
-plt.legend()
+
+subplt1, subplt2, subplt3 = open_subplots(title1)
+plot_single_graph(subplt1, controller.traffic_arrival_times_no_mu(), controller.rho_estimates_no_mu(), '-', 'controller')
+plot_single_graph(subplt2, sw1.rho1_estimates_no_mu_times_controller, sw1.rho1_estimates_no_mu_controller, '-', 'sw1')
+plot_single_graph(subplt3, traffic_creation_times_sw1, sw1.load_balance_no_mu_controller, '-', 'sw1')
+
+plot_single_graph(subplt2, sw2.rho1_estimates_no_mu_times_controller, sw2.rho1_estimates_no_mu_controller, '--', 'sw2')
+plot_single_graph(subplt3, traffic_creation_times_sw2, sw2.load_balance_no_mu_controller, '--', 'sw2')
+
 plt.savefig(save_as3)
-
-print(len(sw1.traffic()))
-print(len(sw2.traffic()))
-print(len(response_times_sw1))
-print(len(response_times_sw2))
-
-#print(traffic_creation_times_sw1)
-
-#print(traffic_creation_times_sw2)
-
