@@ -1,6 +1,6 @@
 from Queuesim import Queue
 
-class LoadBalanceQueue(Queue):
+class QueueLoadBalance(Queue):
     # Detects queue overloading
     def __init__(self, env, capacity, rand_service_time, mu, n, rho_t):
         super().__init__(env, capacity, rand_service_time)
