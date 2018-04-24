@@ -55,16 +55,13 @@ traffic_creation_times_sw1 = [x.creation_time() for x in sw1.traffic()]
 
 traffic_creation_times_sw2 = [x.creation_time() for x in sw2.traffic()]
 
-rho1_estimates_times_sw1, rho1_estimates_sw1 = sw1.rho1_estimates()
-rho1_estimates_times_sw2, rho1_estimates_sw2 = sw2.rho1_estimates()
-
 subplt1, subplt2, subplt3 = open_subplots(title1)
 plot_single_graph(subplt1, {'x':traffic_creation_times_sw1[n1-1:], 'y':sw1.rho_estimates()}, '-', 'sw1')
-plot_single_graph(subplt2, {'x':rho1_estimates_times_sw1, 'y':rho1_estimates_sw1}, '-', 'sw1')
+plot_single_graph(subplt2, sw1.rho1_estimates(), '-', 'sw1')
 plot_single_graph(subplt3, {'x':traffic_creation_times_sw1, 'y':sw1.reassign()}, '-', 'sw1')
 
 plot_single_graph(subplt1, {'x':traffic_creation_times_sw2[n2-1:], 'y':sw2.rho_estimates()}, '--', 'sw2')
-plot_single_graph(subplt2, {'x':rho1_estimates_times_sw2, 'y':rho1_estimates_sw2}, '--', 'sw2')
+plot_single_graph(subplt2, sw2.rho1_estimates(), '--', 'sw2')
 plot_single_graph(subplt3, {'x':traffic_creation_times_sw2, 'y':sw2.reassign()}, '--', 'sw2')
 
 plt.savefig(save_as1)
@@ -74,10 +71,10 @@ plt.clf()
 subplt1, subplt2, subplt3 = open_subplots(title2)
 plot_single_graph(subplt1, {'x':controller.traffic_arrival_times(), 'y':controller.rho_estimates()}, '-', 'controller')
 plot_single_graph(subplt2, {'x':sw1.rho1_estimates_times_controller, 'y':sw1.rho1_estimates_controller}, '-', 'sw1')
-plot_single_graph(subplt3, {'x':traffic_creation_times_sw1, 'y':sw1.load_balance_controller}, '-', 'sw1')
+plot_single_graph(subplt3, {'x':traffic_creation_times_sw1, 'y':sw1.reassign_from_controller()}, '-', 'sw1')
 
 plot_single_graph(subplt2, {'x':sw2.rho1_estimates_times_controller, 'y':sw2.rho1_estimates_controller}, '--', 'sw2')
-plot_single_graph(subplt3, {'x':traffic_creation_times_sw2, 'y':sw2.load_balance_controller}, '--', 'sw2')
+plot_single_graph(subplt3, {'x':traffic_creation_times_sw2, 'y':sw2.reassign_from_controller()}, '--', 'sw2')
 
 plt.savefig(save_as2)
 
@@ -86,9 +83,9 @@ plt.clf()
 subplt1, subplt2, subplt3 = open_subplots(title2)
 plot_single_graph(subplt1, {'x':controller.traffic_arrival_times_no_mu(), 'y':controller.rho_estimates_no_mu()}, '-', 'controller')
 plot_single_graph(subplt2, {'x':sw1.rho1_estimates_no_mu_times_controller, 'y':sw1.rho1_estimates_no_mu_controller}, '-', 'sw1')
-plot_single_graph(subplt3, {'x':traffic_creation_times_sw1, 'y':sw1.load_balance_no_mu_controller}, '-', 'sw1')
+plot_single_graph(subplt3, {'x':traffic_creation_times_sw1, 'y':sw1.reassign_from_controller_unknown_mu()}, '-', 'sw1')
 
 plot_single_graph(subplt2, {'x':sw2.rho1_estimates_no_mu_times_controller, 'y':sw2.rho1_estimates_no_mu_controller}, '--', 'sw2')
-plot_single_graph(subplt3, {'x':traffic_creation_times_sw2, 'y':sw2.load_balance_no_mu_controller}, '--', 'sw2')
+plot_single_graph(subplt3, {'x':traffic_creation_times_sw2, 'y':sw2.reassign_from_controller_unknown_mu()}, '--', 'sw2')
 
 plt.savefig(save_as3)
